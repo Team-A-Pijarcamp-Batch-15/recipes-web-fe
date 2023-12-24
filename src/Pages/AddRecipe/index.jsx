@@ -65,7 +65,7 @@ export default function AddRecipe () {
         showCancelButton: false,
         showConfirmButton: false
       })
-      navigate(`/detail/${title.split(' ').join('-').toLowerCase()}/${recipeAdd.data.data.recipes_uid}`)
+      navigate(`/detail/new/${title.split(' ').join('-').toLowerCase()}/${recipeAdd.data.data.recipes_uid}`)
     } catch (error) {
       console.log(error)
       MySwal.fire({

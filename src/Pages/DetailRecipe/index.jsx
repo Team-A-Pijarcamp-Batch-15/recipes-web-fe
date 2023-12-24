@@ -11,7 +11,8 @@ import { useParams } from 'react-router-dom'
 import Loading from '../../Components/Loading'
 import Error404 from '../../Components/Error404'
 import './detailRecipe.css'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import * as myRecipes from '../../slices/recipesPrivate'
 import * as Icons from 'react-feather'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
@@ -46,8 +47,10 @@ export default function DetailRecipe () {
   const [userComment, setUserComment] = React.useState('')
   const [mesgError, setMesgerror] = React.useState(null)
   const [sucesNotif] = React.useState(null)
-  const { recipes_uid } = useParams()
-  const { token } = useSelector(state => state.auth)
+  const { recipes_uid, new_added } = useParams()
+  const { token, user } = useSelector(state => state.auth)
+  const { created, bookmark, like } = useSelector(state => state.recipesPrivate)
+  const dispatch = useDispatch()
   const MySwal = withReactContent(Swal)
 
   const initpage = async () => {
@@ -64,6 +67,15 @@ export default function DetailRecipe () {
         setRecipesUid(food.data?.data[0]?.recipes_uid)
         setIngredient(food?.data?.data[0]?.ingredients?.ingridient)
         setSteps(food?.data?.data[0]?.ingredients?.steps)
+
+        if (created && new_added === 'new') {
+          const isContain = created?.findIndex(recipe => recipe.recipes_uid === food?.data?.data[0].recipes_uid)
+          const isMyRecipe = food?.data?.data[0]?.created_by === user.user_uid
+
+          if (isMyRecipe && created && isContain === -1) {
+            dispatch(myRecipes.setCreated([...created, food?.data?.data[0]]))
+          }
+        }
 
         const comment = await axios({
           method: 'get',
@@ -127,6 +139,14 @@ export default function DetailRecipe () {
         }
       })
 
+      if (like) {
+        const isContain = like.findIndex(recipe => recipe.recipes_uid === foodDetail.recipes_uid)
+
+        if (isContain === -1) {
+          dispatch(myRecipes.setLike([...like, foodDetail]))
+        }
+      }
+
       MySwal.fire({
         titleText: 'Liked',
         timer: 1000,
@@ -158,6 +178,14 @@ export default function DetailRecipe () {
           Authorization: token
         }
       })
+
+      if (bookmark) {
+        const isContain = bookmark.findIndex(recipe => recipe.recipes_uid === foodDetail.recipes_uid)
+
+        if (isContain === -1) {
+          dispatch(myRecipes.setBookmark([...bookmark, foodDetail]))
+        }
+      }
 
       MySwal.fire({
         titleText: 'Saved',
