@@ -13,6 +13,8 @@ import Error404 from '../../Components/Error404'
 import './detailRecipe.css'
 import { useSelector } from 'react-redux'
 import * as Icons from 'react-feather'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const style = {
   h1: {
@@ -46,6 +48,7 @@ export default function DetailRecipe () {
   const [sucesNotif] = React.useState(null)
   const { recipes_uid } = useParams()
   const { token } = useSelector(state => state.auth)
+  const MySwal = withReactContent(Swal)
 
   const initpage = async () => {
     try {
@@ -111,7 +114,9 @@ export default function DetailRecipe () {
 
   const likeHandler = async () => {
     try {
-      const like = await axios({
+      MySwal.showLoading()
+
+      await axios({
         method: 'post',
         url: `${String(window.env.BE_URL)}/recipes/like`,
         data: {
@@ -121,15 +126,29 @@ export default function DetailRecipe () {
           Authorization: token
         }
       })
-      console.log(like)
+
+      MySwal.fire({
+        titleText: 'Liked',
+        timer: 1000,
+        showCancelButton: false,
+        showConfirmButton: false
+      })
     } catch (error) {
       console.log(error)
+      MySwal.fire({
+        titleText: 'Please Login First',
+        timer: 1000,
+        showCancelButton: false,
+        showConfirmButton: false
+      })
     }
   }
 
   const bookMarkHandler = async () => {
     try {
-      const like = await axios({
+      MySwal.showLoading()
+
+      await axios({
         method: 'post',
         url: `${String(window.env.BE_URL)}/recipes/bookmark`,
         data: {
@@ -140,9 +159,19 @@ export default function DetailRecipe () {
         }
       })
 
-      console.log(like)
+      MySwal.fire({
+        titleText: 'Saved',
+        timer: 1000,
+        showCancelButton: false,
+        showConfirmButton: false
+      })
     } catch (error) {
-      console.log(error)
+      MySwal.fire({
+        titleText: 'Please Login First',
+        timer: 1000,
+        showCancelButton: false,
+        showConfirmButton: false
+      })
     }
   }
 
@@ -169,59 +198,6 @@ export default function DetailRecipe () {
           className="container d-flex flex-column"
           style={{ padding: '3vh 10vw 3vh 10vw' }}
         >
-          <div
-            className="modal fade"
-            id="bookmarkModal"
-            tabIndex="-1"
-            aria-labelledby="exampleModalLabel"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  <div className="alert alert-info" role="alert">
-                    Success
-                  </div>
-                  <div className='text-center'> Saved Succes, ChecK Your Profile</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="modal fade"
-            id="likeModal"
-            tabIndex="-1"
-            aria-labelledby="exampleModalLabel"
-            aria-hidden="true"
-          >
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  <div className="alert alert-info" role="alert">
-                    Success
-                  </div>
-                  <div className='text-center'>Like has added on your profile</div>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <section className="container d-flex flex-column m-auto">
             <h1 style={style.h1}>{foodDetail?.title}</h1>
@@ -243,17 +219,13 @@ export default function DetailRecipe () {
 
                 <button
                   className='btn'
-                  onClick={() => likeHandler()}
-                  data-bs-toggle="modal"
-                  data-bs-target="#likeModal">
+                  onClick={() => likeHandler()}>
                   <Icons.ThumbsUp/>
                 </button>
 
                 <button
                   className='btn'
-                  onClick={() => bookMarkHandler()}
-                  data-bs-toggle="modal"
-                  data-bs-target="#bookmarkModal">
+                  onClick={() => bookMarkHandler()}>
                   <Icons.Bookmark/>
                 </button>
               </div>
@@ -280,15 +252,6 @@ export default function DetailRecipe () {
                 ))}
               </ul>
             </div>
-
-            {/* <div>
-                    <h3>Advice</h3>
-                    <ul>
-                      {advice?.map(
-                        (sugest) => <li>{sugest}</li>
-                      )}
-                    </ul>
-                  </div> */}
 
             <div>
               <h3>Videos</h3>
