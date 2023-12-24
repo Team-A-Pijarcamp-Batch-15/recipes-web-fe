@@ -12,93 +12,6 @@ import Error404 from '../../Components/Error404'
 import { useSelector, useDispatch } from 'react-redux'
 import * as recipes from '../../slices/recipes'
 
-const style = {
-  h1: {
-    color: 'var(--recipe-color-lavender)',
-    fontSize: '48px',
-    fontWeight: 900
-  },
-  headerL: {
-    width: '70vw',
-    height: '100vh',
-    backgroundColor: 'white',
-    zIndex: '-3',
-    marginTop: '-112px'
-  },
-  headerR: {
-    width: '30vw',
-    height: '100vh',
-    backgroundColor: 'var(--recipe-color-yellow)',
-    zIndex: '-2',
-    marginTop: '-112px',
-    position: 'relative'
-  },
-  headerBox: {
-    padding: '20px',
-    position: 'absolute',
-    maxWidth: '500px',
-    left: '16vw',
-    top: '35vh',
-    backgroundColor: 'white',
-    borderRadius: '20px'
-  },
-  headerImg: {
-    width: '600px',
-    position: 'absolute',
-    zIndex: '-1',
-    right: '12vw',
-    top: '20vh'
-  },
-  sectionL: { height: '70vh', position: 'relative' },
-  sectionR: { height: '70vh', position: 'relative' },
-  sectionLable: {
-    color: 'var(--recipe-color-black)',
-    fontSize: '48px',
-    fontWeight: 900,
-    margin: '0 auto'
-  },
-  sectionLableContainer: {
-    borderLeft: 'var(--recipe-color-yellow) solid',
-    borderWidth: '7px',
-    padding: '0px 0px 0px 15px',
-    position: 'absolute',
-    top: '5%'
-  },
-  sectionTitle: {
-    color: 'var(--recipe-color-black)',
-    fontSize: '48px',
-    fontWeight: 900
-  },
-  contentBtn: {
-    width: '180px',
-    height: '53px',
-    fontWeight: 600,
-    color: 'white',
-    backgroundColor: '#efc81a',
-    textAlign: 'center',
-    borderRadius: '36px'
-  },
-  resultNewRecipeDecoration: {
-    position: 'absolute',
-    left: 0,
-    top: '25%',
-    zIndex: -1,
-    height: '350px',
-    width: '240px',
-    backgroundColor: 'var(--recipe-color-yellow)',
-    borderRadius: '5px'
-  },
-  popularDecoration: {
-    position: 'absolute',
-    left: '15%',
-    top: '30%',
-    width: '400px',
-    height: '400px',
-    border: 'var(--recipe-color-yellow) solid',
-    borderRadius: '10px'
-  }
-}
-
 export default function Home () {
   const dispatch = useDispatch()
   const { popular, latest, list } = useSelector((state) => state.recipes)
@@ -537,4 +450,91 @@ export default function Home () {
       <Footer />
     </>
   )
+}
+
+const style = {
+  h1: {
+    color: 'var(--recipe-color-lavender)',
+    fontSize: '48px',
+    fontWeight: 900
+  },
+  headerL: {
+    width: '70vw',
+    height: '100vh',
+    backgroundColor: 'white',
+    zIndex: '-3',
+    marginTop: '-112px'
+  },
+  headerR: {
+    width: '30vw',
+    height: '100vh',
+    backgroundColor: 'var(--recipe-color-yellow)',
+    zIndex: '-2',
+    marginTop: '-112px',
+    position: 'relative'
+  },
+  headerBox: {
+    padding: '20px',
+    position: 'absolute',
+    maxWidth: '500px',
+    left: '16vw',
+    top: '35vh',
+    backgroundColor: 'white',
+    borderRadius: '20px'
+  },
+  headerImg: {
+    width: '600px',
+    position: 'absolute',
+    zIndex: '-1',
+    right: '12vw',
+    top: '20vh'
+  },
+  sectionL: { height: '70vh', position: 'relative' },
+  sectionR: { height: '70vh', position: 'relative' },
+  sectionLable: {
+    color: 'var(--recipe-color-black)',
+    fontSize: '48px',
+    fontWeight: 900,
+    margin: '0 auto'
+  },
+  sectionLableContainer: {
+    borderLeft: 'var(--recipe-color-yellow) solid',
+    borderWidth: '7px',
+    padding: '0px 0px 0px 15px',
+    position: 'absolute',
+    top: '5%'
+  },
+  sectionTitle: {
+    color: 'var(--recipe-color-black)',
+    fontSize: '48px',
+    fontWeight: 900
+  },
+  contentBtn: {
+    width: '180px',
+    height: '53px',
+    fontWeight: 600,
+    color: 'white',
+    backgroundColor: '#efc81a',
+    textAlign: 'center',
+    borderRadius: '36px'
+  },
+  resultNewRecipeDecoration: {
+    position: 'absolute',
+    left: 0,
+    top: '25%',
+    zIndex: -1,
+    height: '350px',
+    width: '240px',
+    backgroundColor: 'var(--recipe-color-yellow)',
+    borderRadius: '5px'
+  },
+  popularDecoration: {
+    position: 'absolute',
+    left: '15%',
+    top: '30%',
+    width: '400px',
+    height: '400px',
+    border: 'var(--recipe-color-yellow) solid',
+    borderRadius: '10px'
+  }
 }
