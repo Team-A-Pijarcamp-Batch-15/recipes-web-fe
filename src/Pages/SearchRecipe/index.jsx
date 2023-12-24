@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 /* eslint-disable no-unused-vars */
 import React from 'react'
 import Navbar from '../../Components/Navbar'
@@ -8,6 +9,7 @@ import { Player } from '@lottiefiles/react-lottie-player'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
 import Loading from '../../Components/Loading'
+import { current } from '@reduxjs/toolkit'
 
 export default function SearchRecipe () {
   const [loading, setLoading] = React.useState(undefined)
@@ -16,9 +18,38 @@ export default function SearchRecipe () {
   const [listRecipe, setListRecipe] = React.useState(undefined)
   const [mesgError, setMesgerror] = React.useState(null)
 
+  const [curentPage, setCurentPage] = React.useState(1)
+  const [amount, setAmount] = React.useState(6)
+  const [sortBy, setSortBy] = React.useState('date')
+  const [sortType, setSortType] = React.useState('desc')
+  const [page, setPage] = React.useState(1)
+
   const initPage = async () => {
     try {
       setLoading(true)
+      if (!listRecipe) {
+        const list = await axios({
+          method: 'get',
+          url: `${window.env.BE_URL}/recipes/search?page=${curentPage}&amount=${amount}&sortBy=${sortBy}&sort=${sortType}`
+        })
+        setListRecipe(list.data.data.search)
+        setCurentPage(list.data.pagination.page)
+        setPage(list.data.pagination['page-length'])
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handlePagination = async (pageParams) => {
+    try {
+      setLoading(true)
+      const getData = await axios.get(`${window.env.BE_URL}/recipes/search?page=${pageParams}&amount=${amount}&sortBy=${sortBy}&sort=${sortType}`)
+      console.log(getData)
+      setListRecipe(getData.data.data.search)
+
       const list = await axios({
         method: 'get',
         url: `${window.env.BE_URL}/home/list`
@@ -53,7 +84,7 @@ export default function SearchRecipe () {
 
   React.useEffect(() => {
     initPage()
-  }, [searchR])
+  }, [])
 
   return (
     <div id="SearchPage">
@@ -108,13 +139,12 @@ export default function SearchRecipe () {
         </div>
       </div>
 
-      {/* Search Content */}
       {/* For Recipe Content */}
       {loading
         ? (
           <Loading />
         )
-        : searchR
+        : !listRecipe
           ? null
           : (
             <div className="container my-4" style={{ margin: '0 auto' }}>
@@ -122,7 +152,7 @@ export default function SearchRecipe () {
                 className="mx-auto p-2"
                 style={{ fontWeight: 900, fontSize: 24 }}
               >
-            Popular Recipe ✨
+            Result ✨
               </div>
               <div className="row">
                 {listRecipe?.map((recipe, index) => {
@@ -157,57 +187,36 @@ export default function SearchRecipe () {
               </div>
             </div>
           )}
-
-      {/* For Recipe Content */}
-      {loading
-        ? (
-          <Loading />
-        )
-        : !searchR
-          ? null
-          : (
-            <div className="container my-4" style={{ margin: '0 auto' }}>
-              <div
-                className="mx-auto p-2"
-                style={{ fontWeight: 900, fontSize: 24 }}
-              >
-            Result ✨
-              </div>
-              <div className="row">
-                {searchR?.map((recipe, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className="col-lg-4 col-md-5 col-sm-6 col-xs-12 p-3 "
-                    >
-                      <Link
-                        to={`/detail/${String(recipe.title)
-                          .split(' ')
-                          .join('-')
-                          .toLowerCase()}/${recipe.recipes_uid}`}
-                      >
-                        <div
-                          style={{
-                            ...styles.resultCard,
-                            backgroundImage: `url(${recipe.image})`
-                          }}
-                        >
-                          <div
-                            className="p-3"
-                            style={styles.resultCardTitleContainer}
-                          >
-                            <p style={styles.resultCardTitle}>{recipe.title}</p>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
       {/* End of Search Content */}
 
+      {/* pagination */}
+      <div className="container d-flex justify-content-center">
+        <nav aria-label="Page navigation example">
+          <div className="pagination">
+
+            <a className="page-link" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+            {[...new Array(page)]?.map((item, key) => {
+              const incrementValueButton = ++key
+              return (
+                <div key={incrementValueButton}>
+                  <div
+                    key={key}
+                    className="page-item"
+                    onClick={() => handlePagination(incrementValueButton)}
+                  >
+                    <a className="page-link">{incrementValueButton}</a>
+                  </div>
+                </div>
+              )
+            })}
+            <a className="page-link" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </div>
+        </nav>
+      </div>
       <Footer />
     </div>
   )
