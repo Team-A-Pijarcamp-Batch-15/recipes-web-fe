@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom'
 import './Home.css'
 import Loading from '../../Components/Loading'
 import Error404 from '../../Components/Error404'
+import * as Icons from 'react-feather'
 
 import { useSelector, useDispatch } from 'react-redux'
 import * as recipes from '../../slices/recipes'
@@ -62,12 +63,23 @@ export default function Home () {
           <h1 style={style.h1}>
             Discover Recipe <br />& Delicious Food
           </h1>
-          <input
-            style={{ height: '48px' }}
-            type="search"
-            className="form-control"
-            placeholder="Search restaurant, food"
-          />
+          <Link to='/search'>
+            <div className='shadow-sm border' style={{ borderRadius: 50 }}>
+              <div id='search-text' className='mx-auto' style={{
+                display: 'flex',
+                width: 'fit-content',
+                gap: 10,
+                padding: 10,
+                margin: 2,
+                textAlign: 'center',
+                fontWeight: 800,
+                color: 'black'
+              }}>
+                <p>Search dishes here!</p>
+                <Icons.Search/>
+              </div>
+            </div>
+          </Link>
         </div>
         <div className="headerL" style={style.headerL}></div>
         <div className="headerR" style={style.headerR}></div>

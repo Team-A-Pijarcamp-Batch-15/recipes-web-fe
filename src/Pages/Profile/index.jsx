@@ -7,19 +7,124 @@ import * as Icons from 'react-feather'
 import RecipeCardPrivate from '../../Components/RecipeCardPrivate'
 import Navbar from '../../Components/Navbar/index'
 import Footer from '../../Components/Footer/index'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import * as myRecipes from '../../slices/recipesPrivate'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 function Profile () {
-  // const [bookmark, setBookmark] = React.useState(undefined)
-  // const [like, setLike] = React.useState(undefined)
-  // const [created, setCreated] = React.useState(undefined)
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const { initialized, created, bookmark, like } = useSelector(state => state.recipesPrivate)
+  const MySwal = withReactContent(Swal)
 
+  const { initialized, created, bookmark, like } = useSelector(state => state.recipesPrivate)
   const { token, user } = useSelector(state => state.auth)
+
+  const handleRemoveCreated = React.useCallback(async (uid) => {
+    try {
+      await axios({
+        method: 'delete',
+        url: `${window.env.BE_URL}/recipes/delete`,
+        data: {
+          recipes_uid: uid
+        },
+        headers: {
+          Authorization: token
+        }
+      })
+
+      const index = created?.findIndex(recipe => recipe.recipes_uid === uid)
+      const newCreated = [...created]
+      newCreated.splice(index, 1)
+
+      dispatch(myRecipes.setCreated(newCreated))
+
+      MySwal.fire({
+        titleText: 'Recipe Removed',
+        timer: 1000,
+        showCancelButton: false,
+        showConfirmButton: false
+      })
+    } catch (error) {
+      MySwal.fire({
+        titleText: 'Remove Failed',
+        timer: 1000,
+        showCancelButton: false,
+        showConfirmButton: false
+      })
+    }
+  }, [created])
+
+  const handleRemoveBookmark = React.useCallback(async (uid) => {
+    try {
+      await axios({
+        method: 'delete',
+        url: `${window.env.BE_URL}/recipes/unbookmark`,
+        data: {
+          recipes_uid: uid
+        },
+        headers: {
+          Authorization: token
+        }
+      })
+
+      const index = bookmark?.findIndex(recipe => recipe.recipes_uid === uid)
+      const newBookmark = [...bookmark]
+      newBookmark.splice(index, 1)
+
+      dispatch(myRecipes.setBookmark(newBookmark))
+
+      MySwal.fire({
+        titleText: 'Recipe Unsaved',
+        timer: 1000,
+        showCancelButton: false,
+        showConfirmButton: false
+      })
+    } catch (error) {
+      MySwal.fire({
+        titleText: 'Unsave Recipe Failed',
+        timer: 1000,
+        showCancelButton: false,
+        showConfirmButton: false
+      })
+    }
+  }, [bookmark])
+
+  const handleRemoveLike = React.useCallback(async (uid) => {
+    try {
+      await axios({
+        method: 'delete',
+        url: `${window.env.BE_URL}/recipes/dislike`,
+        data: {
+          recipes_uid: uid
+        },
+        headers: {
+          Authorization: token
+        }
+      })
+
+      const index = like?.findIndex(recipe => recipe.recipes_uid === uid)
+      const newLike = [...like]
+      newLike.splice(index, 1)
+
+      dispatch(myRecipes.setLike(newLike))
+
+      MySwal.fire({
+        titleText: 'Recipe Disliked',
+        timer: 1000,
+        showCancelButton: false,
+        showConfirmButton: false
+      })
+    } catch (error) {
+      MySwal.fire({
+        titleText: 'Recipe Disliked Failed',
+        timer: 1000,
+        showCancelButton: false,
+        showConfirmButton: false
+      })
+    }
+  }, [like])
 
   const createdRecipe = React.useCallback(async () => {
     try {
@@ -125,16 +230,14 @@ function Profile () {
 
         <div className={`mt-3 text-center d-flex flex-wrap ${created?.length > 3 ? 'justify-content-around' : ''}`}>
           {
-            !created
+            !created | created?.length === 0
               ? <p>Sorry you haven't made any recipes yet</p>
               : created?.map((item, index) => (
-                <Link key={index} to={`/detail/${String(item.title)
-                  .split(' ')
-                  .join('-')
-                  .toLowerCase()}/${item.recipes_uid}`}>
-                  <RecipeCardPrivate image={item.image} title={item.title} key={index}
-                    removeHandler={() => { alert('Sorry the feature are coming soon') }} />
-                </Link>
+                <RecipeCardPrivate key={index} image={item.image} title={item.title}
+                  removeHandler={() => { handleRemoveCreated(item.recipes_uid) }} to={`/detail/${String(item.title)
+                    .split(' ')
+                    .join('-')
+                    .toLowerCase()}/${item.recipes_uid}`} />
               ))
           }
         </div>
@@ -148,16 +251,14 @@ function Profile () {
 
         <div className={'mt-3 text-center d-flex flex-wrap'}>
           {
-            !bookmark
+            !bookmark || bookmark?.length === 0
               ? <p>Sorry you haven't saved any recipes</p>
               : bookmark?.map((item, index) => (
-                <Link key={index} to={`/detail/${String(item.title)
-                  .split(' ')
-                  .join('-')
-                  .toLowerCase()}/${item.recipes_uid}`}>
-                  <RecipeCardPrivate image={item.image} title={item.title} key={index}
-                    removeHandler={() => { alert('Sorry the feature are coming soon') }} />
-                </Link>
+                <RecipeCardPrivate key={index} image={item.image} title={item.title}
+                  removeHandler={() => { handleRemoveBookmark(item.recipes_uid) }} to={`/detail/${String(item.title)
+                    .split(' ')
+                    .join('-')
+                    .toLowerCase()}/${item.recipes_uid}`} />
               ))
           }
         </div>
@@ -171,16 +272,14 @@ function Profile () {
 
         <div className={`mt-3 text-center d-flex flex-wrap ${like?.length > 3 ? 'justify-content-around' : ''}`}>
           {
-            !like
+            !like || like?.length === 0
               ? <p>Sorry you haven't liked any recipes yet</p>
               : like?.map((item, index) => (
-                <Link key={index} to={`/detail/${String(item.title)
-                  .split(' ')
-                  .join('-')
-                  .toLowerCase()}/${item.recipes_uid}`}>
-                  <RecipeCardPrivate image={item.image} title={item.title} key={index}
-                    removeHandler={() => { alert('Sorry the feature are coming soon') }} />
-                </Link>
+                <RecipeCardPrivate key={index} image={item.image} title={item.title}
+                  removeHandler={() => { handleRemoveLike(item.recipes_uid) }} to={`/detail/${String(item.title)
+                    .split(' ')
+                    .join('-')
+                    .toLowerCase()}/${item.recipes_uid}`} />
               ))
           }
         </div>
