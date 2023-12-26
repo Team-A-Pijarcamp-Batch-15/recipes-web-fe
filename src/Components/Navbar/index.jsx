@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import './Navbar.css'
 import { useSelector } from 'react-redux'
 import { persistor } from '../../store'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 const style = {
   navLeftLink: {
@@ -14,6 +16,7 @@ const style = {
 
 export default function Navbar () {
   const { user, token } = useSelector(state => state.auth)
+  const MySwal = withReactContent(Swal)
 
   React.useEffect(() => {
   }, [])
@@ -55,6 +58,23 @@ export default function Navbar () {
                 >
                   <span style={style.navLeftLink} className="nav-left-link">
                     Search Recipe
+                  </span>
+                </div>
+              </Link>
+              <Link to="/user/login" onClick={() => {
+                MySwal.fire({
+                  titleText: 'Please Login First',
+                  timer: 1000,
+                  showCancelButton: false,
+                  showConfirmButton: false
+                })
+              }}>
+                <div
+                  className="nav-container shadow-sm p-3 desktop-component"
+                  style={{ borderRadius: '36px', backgroundColor: 'white' }}
+                >
+                  <span style={style.navLeftLink} className="nav-left-link">
+                    Add Recipe
                   </span>
                 </div>
               </Link>
