@@ -64,20 +64,20 @@ export default function Home () {
             Discover Recipe <br />& Delicious Food
           </h1>
           <Link to='/search'>
-            <div id='search-text' className='shadow-sm border' style={{
-              display: 'flex',
-              gap: 10,
-              padding: 10,
-              margin: 2,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 50,
-              textAlign: 'center',
-              fontWeight: 800,
-              color: 'black'
-            }}>
-              <p >Search anything you like, Search Here.</p>
-              <Icons.Search/>
+            <div className='shadow-sm border' style={{ borderRadius: 50 }}>
+              <div id='search-text' className='mx-auto' style={{
+                display: 'flex',
+                width: 'fit-content',
+                gap: 10,
+                padding: 10,
+                margin: 2,
+                textAlign: 'center',
+                fontWeight: 800,
+                color: 'black'
+              }}>
+                <p>Search dishes here!</p>
+                <Icons.Search/>
+              </div>
             </div>
           </Link>
         </div>
