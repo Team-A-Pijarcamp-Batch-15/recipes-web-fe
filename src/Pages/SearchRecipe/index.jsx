@@ -127,6 +127,11 @@ export default function SearchRecipe () {
             type="search"
             placeholder="Mau cari resep apa...?"
             onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                handleTanyaButton()
+              }
+            }}
           />
 
           <button
