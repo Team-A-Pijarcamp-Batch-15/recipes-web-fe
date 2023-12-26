@@ -8,25 +8,31 @@ import RecipeCardPrivate from '../../Components/RecipeCardPrivate'
 import Navbar from '../../Components/Navbar/index'
 import Footer from '../../Components/Footer/index'
 import { Link, useNavigate } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import * as myRecipes from '../../slices/recipesPrivate'
 
 function Profile () {
-  const [bookmark, setBookmark] = React.useState(undefined)
-  const [like, setLike] = React.useState(undefined)
-  const [created, setCreated] = React.useState(undefined)
+  // const [bookmark, setBookmark] = React.useState(undefined)
+  // const [like, setLike] = React.useState(undefined)
+  // const [created, setCreated] = React.useState(undefined)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { initialized, created, bookmark, like } = useSelector(state => state.recipesPrivate)
 
   const { token, user } = useSelector(state => state.auth)
 
-  const myRecipe = React.useCallback(async () => {
+  const createdRecipe = React.useCallback(async () => {
     try {
-      const myRecipe = await axios.get(`${window.env.BE_URL}/recipes/getmyrecipe`, {
-        headers: {
-          Authorization: token
-        }
-      })
+      if (!initialized.created) {
+        const myRecipe = await axios.get(`${window.env.BE_URL}/recipes/getmyrecipe`, {
+          headers: {
+            Authorization: token
+          }
+        })
 
-      setCreated(myRecipe?.data.data)
+        dispatch(myRecipes.setInit('created'))
+        dispatch(myRecipes.setCreated(myRecipe?.data.data))
+      }
     } catch (error) {
       console.log(error)
     }
@@ -34,13 +40,16 @@ function Profile () {
 
   const myBookmark = React.useCallback(async () => {
     try {
-      const bookmarkResponse = await axios.get(`${window.env.BE_URL}/recipes/getmybookmark`, {
-        headers: {
-          Authorization: token
-        }
-      })
+      if (!initialized.bookmark) {
+        const bookmarkResponse = await axios.get(`${window.env.BE_URL}/recipes/getmybookmark`, {
+          headers: {
+            Authorization: token
+          }
+        })
 
-      setBookmark(bookmarkResponse?.data?.data)
+        dispatch(myRecipes.setInit('bookmark'))
+        dispatch(myRecipes.setBookmark(bookmarkResponse?.data?.data))
+      }
     } catch (error) {
       console.log(error)
     }
@@ -48,13 +57,16 @@ function Profile () {
 
   const myLikes = React.useCallback(async () => {
     try {
-      const likedResponse = await axios.get(`${window.env.BE_URL}/recipes/getmylikes`, {
-        headers: {
-          Authorization: token
-        }
-      })
+      if (!initialized.like) {
+        const likedResponse = await axios.get(`${window.env.BE_URL}/recipes/getmylikes`, {
+          headers: {
+            Authorization: token
+          }
+        })
 
-      setLike(likedResponse?.data?.data)
+        dispatch(myRecipes.setInit('like'))
+        dispatch(myRecipes.setLike(likedResponse?.data?.data))
+      }
     } catch (error) {
       console.log(error)
     }
@@ -65,7 +77,7 @@ function Profile () {
       navigate('/')
     }
 
-    myRecipe()
+    createdRecipe()
     myBookmark()
     myLikes()
   }, [])

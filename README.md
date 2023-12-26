@@ -16,7 +16,7 @@ Feature :
 
 Developer :
 
-![developer](https://contrib.rocks/image?repo=Team-A-Pijarcamp-Batch-15/receipes-web-be&anon=false)
+![developer](https://contrib.rocks/image?repo=Team-A-Pijarcamp-Batch-15/receipes-web-be)
 
 Tech Stack : Javascript, ReactJS, React Router, Redux, Bootstrap  
 Preview : <https://recipes-web-fe.vercel.app>  

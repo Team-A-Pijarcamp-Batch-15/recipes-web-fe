@@ -19,6 +19,10 @@ const router = createBrowserRouter([
     element: <DetailRecipe />
   },
   {
+    path: '/detail/:new_added/:slug/:recipes_uid',
+    element: <DetailRecipe />
+  },
+  {
     path: '/user/login',
     element: <Login />
   },

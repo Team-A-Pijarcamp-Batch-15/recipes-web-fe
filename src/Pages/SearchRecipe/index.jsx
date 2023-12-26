@@ -3,38 +3,35 @@
 import React from 'react'
 import Navbar from '../../Components/Navbar'
 import Footer from '../../Components/Footer'
-// import Loading from "../../Components/Loading";
-// import Error404 from "../../Components/Error404";
 import { Player } from '@lottiefiles/react-lottie-player'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
 import Loading from '../../Components/Loading'
-import { current } from '@reduxjs/toolkit'
+import './SearchRecipe.css'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 
 export default function SearchRecipe () {
   const [loading, setLoading] = React.useState(undefined)
-  const [searchR, setSearchR] = React.useState(undefined)
-  const [search, setSearch] = React.useState('')
   const [listRecipe, setListRecipe] = React.useState(undefined)
   const [mesgError, setMesgerror] = React.useState(null)
+  const [search, setSearch] = React.useState('')
 
   const [curentPage, setCurentPage] = React.useState(1)
-  const [amount, setAmount] = React.useState(6)
-  const [sortBy, setSortBy] = React.useState('date')
-  const [sortType, setSortType] = React.useState('desc')
   const [page, setPage] = React.useState(1)
+
+  const MySwal = withReactContent(Swal)
 
   const initPage = async () => {
     try {
-      setLoading(true)
       if (!listRecipe) {
+        setLoading(true)
         const list = await axios({
           method: 'get',
-          url: `${window.env.BE_URL}/recipes/search?page=${curentPage}&amount=${amount}&sortBy=${sortBy}&sort=${sortType}`
+          url: `${window.env.BE_URL}/home/list`
         })
-        setListRecipe(list.data.data.search)
-        setCurentPage(list.data.pagination.page)
-        setPage(list.data.pagination['page-length'])
+
+        setListRecipe(list.data.data)
       }
     } catch (error) {
       console.log(error)
@@ -46,16 +43,13 @@ export default function SearchRecipe () {
   const handlePagination = async (pageParams) => {
     try {
       setLoading(true)
-      const getData = await axios.get(`${window.env.BE_URL}/recipes/search?page=${pageParams}&amount=${amount}&sortBy=${sortBy}&sort=${sortType}`)
-      console.log(getData)
-      setListRecipe(getData.data.data.search)
-
       const list = await axios({
         method: 'get',
-        url: `${window.env.BE_URL}/home/list`
+        url: `${window.env.BE_URL}/recipes/search?title=${search}&page=${pageParams}`
       })
-
-      setListRecipe(list.data.data)
+      setListRecipe(list.data.data.search)
+      setCurentPage(list.data.pagination.page)
+      setPage(list.data.pagination['page-length'])
     } catch (error) {
       console.log(error)
     } finally {
@@ -67,15 +61,23 @@ export default function SearchRecipe () {
     try {
       setLoading(true)
 
-      const result = await axios({
+      const list = await axios({
         method: 'get',
         url: `${window.env.BE_URL}/recipes/search?title=${search}`
       })
-
-      setSearchR(result.data.data.search)
+      setListRecipe(list.data.data.search)
+      setCurentPage(list.data.pagination.page)
+      setPage(list.data.pagination['page-length'])
     } catch (error) {
       if (error.response.status === 502) {
         setMesgerror('Bad Gateway')
+      } else if (error.response.status === 404) {
+        MySwal.fire({
+          titleText: 'Sorry, No Recipe Found',
+          timer: 1000,
+          showCancelButton: false,
+          showConfirmButton: false
+        })
       }
     } finally {
       setLoading(false)
@@ -84,7 +86,7 @@ export default function SearchRecipe () {
 
   React.useEffect(() => {
     initPage()
-  }, [])
+  }, [listRecipe])
 
   return (
     <div id="SearchPage">
@@ -140,10 +142,8 @@ export default function SearchRecipe () {
       </div>
 
       {/* For Recipe Content */}
-      {loading
-        ? (
-          <Loading />
-        )
+      { loading
+        ? <Loading/>
         : !listRecipe
           ? null
           : (
@@ -152,7 +152,6 @@ export default function SearchRecipe () {
                 className="mx-auto p-2"
                 style={{ fontWeight: 900, fontSize: 24 }}
               >
-            Result ✨
               </div>
               <div className="row">
                 {listRecipe?.map((recipe, index) => {
@@ -186,34 +185,33 @@ export default function SearchRecipe () {
                 })}
               </div>
             </div>
-          )}
+          )
+      }
       {/* End of Search Content */}
 
       {/* pagination */}
       <div className="container d-flex justify-content-center">
         <nav aria-label="Page navigation example">
           <div className="pagination">
-
-            <a className="page-link" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
             {[...new Array(page)]?.map((item, key) => {
-              const incrementValueButton = ++key
+              const incrementValueButton = key + 1
               return (
-                <div key={incrementValueButton}>
+                <div key={key}>
                   <div
-                    key={key}
                     className="page-item"
-                    onClick={() => handlePagination(incrementValueButton)}
+                    onClick={() => {
+                      setCurentPage(incrementValueButton)
+                      handlePagination(incrementValueButton)
+                    }}
                   >
-                    <a className="page-link">{incrementValueButton}</a>
+                    <a className="page-link shadow-sm" style={{
+                      ...styles.paginationItems,
+                      backgroundColor: curentPage === incrementValueButton ? 'var(--recipe-color-yellow)' : ''
+                    }}>{incrementValueButton}</a>
                   </div>
                 </div>
               )
             })}
-            <a className="page-link" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
           </div>
         </nav>
       </div>
@@ -262,5 +260,17 @@ const styles = {
     fontWeight: 600,
     margin: 'unset',
     color: 'white'
+  },
+  paginationItems: {
+    cursor: 'pointer',
+    color: 'var(--recipe-color-lavender)',
+    fontWeight: 800,
+    borderRadius: 50,
+    width: 40,
+    height: 40,
+    display: 'flex',
+    margin: 2,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 }

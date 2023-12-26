@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import storage from 'redux-persist/lib/storage'
 import authSliceReducer from './slices/auth'
 import recipeSliceReducer from './slices/recipes'
+import recipePrivateSliceReducer from './slices/recipesPrivate'
 
 const authPersist = persistReducer({
   key: 'auth',
@@ -13,16 +14,10 @@ const authPersist = persistReducer({
 authSliceReducer
 )
 
-//
-// the middleware inside configureStore is to fix bug non serialize on redux persist
-//
-// nah nama store nya movie, trus object movieSlices bakal digunain buat
-// controller si setter di movie slice ada setResultNowshowing,setResultUpcoming,setAllResult
-//
-
 export const store = configureStore({
   reducer: {
     recipes: recipeSliceReducer,
+    recipesPrivate: recipePrivateSliceReducer,
     auth: authPersist
   },
   middleware: (getDefaultMiddleware) =>
