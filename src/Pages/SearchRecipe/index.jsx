@@ -125,8 +125,6 @@ export default function SearchRecipe () {
             autoFocus={true}
             style={{ height: '53px', borderRadius: 50, borderWidth: 2 }}
             type="search"
-            name="search"
-            id="search"
             placeholder="Mau cari resep apa...?"
             onChange={(e) => setSearch(e.target.value)}
           />
